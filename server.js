@@ -10,10 +10,7 @@ const app = require('./app');
 const DB = process.env.DATABASE;
 
 mongoose
-  .connect(DB, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(DB)
   .then(() => {
     console.log('MongoDB connection successful!');
   })
