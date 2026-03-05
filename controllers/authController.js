@@ -1,18 +1,15 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 
-// Helper function to generate JWT
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
 
-// Helper function to send token response
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
 
-  // Remove password from output
   user.password = undefined;
 
   res.status(statusCode).json({
@@ -24,12 +21,10 @@ const createSendToken = (user, statusCode, res) => {
   });
 };
 
-// Signup Controller
 exports.signup = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
-    // Create new user
     const newUser = await User.create({
       name,
       email,
@@ -37,7 +32,6 @@ exports.signup = async (req, res) => {
       role,
     });
 
-    // Generate JWT and send response
     createSendToken(newUser, 201, res);
   } catch (error) {
     // Handle duplicate email error
@@ -48,7 +42,6 @@ exports.signup = async (req, res) => {
       });
     }
 
-    // Handle validation errors
     if (error.name === "ValidationError") {
       const errors = Object.values(error.errors).map((el) => el.message);
       return res.status(400).json({
@@ -65,12 +58,10 @@ exports.signup = async (req, res) => {
   }
 };
 
-// Login Controller
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // 1) Check if email and password exist
     if (!email || !password) {
       return res.status(400).json({
         status: "fail",
@@ -78,7 +69,6 @@ exports.login = async (req, res) => {
       });
     }
 
-    // 2) Check if user exists and password is correct
     const user = await User.findOne({ email }).select("+password");
 
     if (!user || !(await user.correctPassword(password, user.password))) {
@@ -88,7 +78,6 @@ exports.login = async (req, res) => {
       });
     }
 
-    // 3) If everything ok, send token to client
     createSendToken(user, 200, res);
   } catch (error) {
     res.status(500).json({

@@ -4,7 +4,6 @@ const User = require("../models/userModel");
 
 exports.protect = async (req, res, next) => {
   try {
-    // 1) Get token from Authorization header
     let token;
     if (
       req.headers.authorization &&
@@ -20,10 +19,8 @@ exports.protect = async (req, res, next) => {
       });
     }
 
-    // 2) Verify token
     const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
-    // 3) Check if user still exists
     const currentUser = await User.findById(decoded.id);
     if (!currentUser) {
       return res.status(401).json({
@@ -32,7 +29,6 @@ exports.protect = async (req, res, next) => {
       });
     }
 
-    // 4) Attach user to request object
     req.user = currentUser;
     next();
   } catch (error) {
