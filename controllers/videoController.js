@@ -1,5 +1,6 @@
 const Video = require("../models/videoModel")
-export const createVideo = async (req, res) => {
+
+const createVideo = async (req, res) => {
     try {
         const { title, description } = req.body;
 
@@ -15,7 +16,7 @@ export const createVideo = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
-export const getVideos = async (req, res) => {
+const getVideos = async (req, res) => {
     try {
         const videos = await Video.find()
             .populate("user", "name email"); 
@@ -25,3 +26,5 @@ export const getVideos = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
+
+module.exports = { createVideo, getVideos };
